@@ -57,17 +57,21 @@ go test -v ./internal/...
 
 ### Как это работает?
 
-```graph TD
+```mermaid
+graph TD
 U[Пользователь] -->|POST /calculate| O[Оркестратор]
 U -->|GET /expressions| O
 O -->|GET /internal/task| A[Агент]
 subgraph Workers
 W1[Worker 1]
 W2[Worker 2]
-W3[Worker 3]
-Wn[...]
+W3[Worker ...]
+Wn[Worker COMPUTING_POWER]
 end
 A -->|Computing power| Workers
 Workers -->|POST /internal/task| A
 A -->|POST /internal/task| O
 ```
+
+> [!NOTE]
+> По умолчанию COMPUTING_POWER = 1.
