@@ -110,7 +110,7 @@ func (p *parser) parseFactor() (*ASTNode, error) {
 			return nil, err
 		}
 		if p.peek() != ')' {
-			return nil, fmt.Errorf("missing closing parenthesis")
+			return nil, fmt.Errorf("missing closing parenthesis at position %d", p.pos)
 		}
 		p.get()
 		return node, nil

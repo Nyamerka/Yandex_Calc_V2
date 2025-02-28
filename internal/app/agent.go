@@ -65,7 +65,7 @@ func (a *Agent) Calculate(op string, x, y float64) (float64, error) {
 		}
 		return x / y, nil
 	default:
-		return 0, fmt.Errorf("invalid operator: %s", op)
+		return 0, errors.New(fmt.Sprintf("invalid operator: %s", op))
 	}
 }
 
@@ -111,7 +111,7 @@ func (a *Agent) worker(id int) {
 			log.Printf("Worker %d: error closing task body: %v", id, err)
 		}
 		task := taskResp.Task
-		log.Printf("Worker %d: received task %s: %f %s %f, simulating %d ms", id, task.ID, task.Arg1, task.Operation, task.Arg2, task.OperationTime)
+		log.Printf("Worker %d: received task %s: %f %s %f, simulating computation %d ms", id, task.ID, task.Arg1, task.Operation, task.Arg2, task.OperationTime)
 		time.Sleep(time.Duration(task.OperationTime) * time.Millisecond)
 		result, err := a.Calculate(task.Operation, task.Arg1, task.Arg2)
 		if err != nil {

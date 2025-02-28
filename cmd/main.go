@@ -15,7 +15,7 @@ func main() {
 
 	go func() {
 		if err := orchestrator.StartServer(); err != nil {
-			log.Fatalf("Failed to start server: %v", err)
+			log.Fatalf("Failed to start orchestrator: %v", err)
 		}
 	}()
 
@@ -27,8 +27,8 @@ func main() {
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	<-signalChan
 
-	log.Println("Shutting down server and agent...")
+	log.Println("Shutting down orchestrator and agent...")
 
 	time.Sleep(2 * time.Second)
-	log.Println("Server and agent shutdown complete.")
+	log.Println("Orchestrator and agent shutdown complete.")
 }

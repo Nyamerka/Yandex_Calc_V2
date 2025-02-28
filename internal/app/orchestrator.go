@@ -90,7 +90,7 @@ func (o *Orchestrator) handleCalculateRequest(c *gin.Context) {
 	}
 	ast, err := ParseAST(req.Expression)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "Invalid expression"})
 		return
 	}
 	o.mutex.Lock()
@@ -277,7 +277,7 @@ func (o *Orchestrator) StartServer() error {
 			time.Sleep(4 * time.Second)
 			o.mutex.Lock()
 			if o.taskQueue.Len() > 0 {
-				log.Printf("Pending tasks in queue: %d", o.taskQueue.Len())
+				log.Printf("Collecting tasks in queue: %d", o.taskQueue.Len())
 			}
 			o.mutex.Unlock()
 		}
