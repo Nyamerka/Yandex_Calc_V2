@@ -15,10 +15,10 @@ import (
 // TODO: Вынести всё это добро либо в .env, либо в файл .yaml для Docker
 const (
 	DEFAULT_PORT            = "8080"
-	TIME_ADDITION_MS        = 100
-	TIME_SUBTRACTION_MS     = 100
-	TIME_MULTIPLICATIONS_MS = 100
-	TIME_DIVISIONS_MS       = 100
+	TIME_ADDITION_MS        = 200
+	TIME_SUBTRACTION_MS     = 152
+	TIME_MULTIPLICATIONS_MS = 228
+	TIME_DIVISIONS_MS       = 300
 )
 
 type Expression struct {
@@ -239,7 +239,7 @@ func (o *Orchestrator) scheduleTasksForExpression(expr *Expression) {
 				case "/":
 					opTime = o.Config.TimeForDivision
 				default:
-					opTime = 100
+					opTime = 222
 				}
 				task := &Task{
 					ID:            taskID,

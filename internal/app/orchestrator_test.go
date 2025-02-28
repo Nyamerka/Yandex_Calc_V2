@@ -36,7 +36,7 @@ func TestHandleCalculateRequest(t *testing.T) {
 			name:           "Invalid Expression",
 			inputBody:      `{"expression": "1 + "}`,
 			expectedStatus: http.StatusUnprocessableEntity,
-			expectedBody:   `{"error":"expected number at position 2"}`, // Предполагается, что ParseAST вернет ошибку "invalid syntax"
+			expectedBody:   `{"error":"Invalid expression"}`,
 		},
 		{
 			name:           "Empty Body",

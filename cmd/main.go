@@ -19,7 +19,7 @@ func main() {
 		}
 	}()
 
-	agent := app.SetDefaultAgent()
+	agent := app.NewAgent()
 
 	go agent.Run()
 
