@@ -59,18 +59,33 @@ go test -v ./internal/...
 
 ```mermaid
 graph TD
-U[Пользователь] -->|POST /calculate| O[Оркестратор]
-U -->|GET /expressions| O
-O -->|GET /internal/task| A[Агент]
-subgraph Workers
-W1[Worker 0]
-W2[Worker 1]
-W3[Worker 2]
-Wn[Worker ...]
-end
-A -->|COMPUTING_POWER| Workers
-Workers -->|POST /internal/task| A
-A -->|POST /internal/task| O
+    U[Пользователь] -->|POST /calculate| O[Оркестратор]
+    U -->|GET /expressions| O
+    O -->|GET /internal/task| A[Агент]
+    subgraph COMPUTING_POWER
+        W1[Worker 0]
+        W2[Worker 1]
+        W3[Worker 2]
+        Wn[Worker ...]
+    end
+    A -->|COMPUTING_POWER| COMPUTING_POWER
+    COMPUTING_POWER -->|RESULT| A
+    A -->|POST /internal/task| O
+
+    style U fill:#9acd32,stroke:#333,stroke-width:2px,color:#000
+    style O fill:#add8e6,stroke:#333,stroke-width:2px,color:#000
+    style A fill:#add8e6,stroke:#333,stroke-width:2px,color:#000
+    style W1 fill:#ff4500,stroke:#333,stroke-width:2px,color:#000
+    style W2 fill:#ff4500,stroke:#333,stroke-width:2px,color:#000
+    style W3 fill:#ff4500,stroke:#333,stroke-width:2px,color:#000
+    style Wn fill:#ff4500,stroke:#333,stroke-width:2px,color:#000
+
+    linkStyle 0 stroke:#228b22,stroke-width:2px,color:#228b22
+    linkStyle 1 stroke:#4682b4,stroke-width:2px,color:#4682b4
+    linkStyle 2 stroke:#4682b4,stroke-width:2px,color:#4682b4
+    linkStyle 3 stroke:#8a2be2,stroke-width:2px,color:#8a2be2
+    linkStyle 4 stroke:#8a2be2,stroke-width:2px,color:#8a2be2
+    linkStyle 5 stroke:#228b22,stroke-width:2px,color:#228b22
 ```
 
 Таким образом, оркестратор создаёт агента, который в свою очередь имеет определённую вычислительную мощность - количество параллельно вычисляющихся задач, на каждую из которых выделяется исполнитель, решающий эту задачу. Worker - не отдельный класс или структура, а лишь метод агента.
