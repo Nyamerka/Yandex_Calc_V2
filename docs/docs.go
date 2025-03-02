@@ -80,7 +80,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/app.ExpressionResponse"
+                                "$ref": "#/definitions/app.ExpressionsResponse"
                             }
                         }
                     }
@@ -223,7 +223,28 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "type": "string",
-                    "example": "123"
+                    "example": "1"
+                }
+            }
+        },
+        "app.ExpressionsResponse": {
+            "description": "Ответ с идентификатором задачи",
+            "type": "object",
+            "properties": {
+                "expression": {
+                    "type": "string",
+                    "example": "2+3*4-5/2"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "result": {
+                    "type": "number"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "completed"
                 }
             }
         },

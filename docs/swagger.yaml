@@ -20,7 +20,22 @@ definitions:
     description: Ответ с идентификатором задачи
     properties:
       id:
-        example: "123"
+        example: "1"
+        type: string
+    type: object
+  app.ExpressionsResponse:
+    description: Ответ с идентификатором задачи
+    properties:
+      expression:
+        example: 2+3*4-5/2
+        type: string
+      id:
+        example: "1"
+        type: string
+      result:
+        type: number
+      status:
+        example: completed
         type: string
     type: object
   app.SuccessResponse:
@@ -111,7 +126,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/app.ExpressionResponse'
+              $ref: '#/definitions/app.ExpressionsResponse'
             type: array
       summary: Get all calculated expressions
       tags:

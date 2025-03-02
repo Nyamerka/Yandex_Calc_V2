@@ -14,7 +14,7 @@ import (
 
 type mockOrchestrator struct {
 	taskResponse *TaskResponse
-	taskResult   chan map[string]interface{}
+	taskResult   chan *TaskResult
 }
 
 func TestCalculate(t *testing.T) {
@@ -73,13 +73,13 @@ func (m *mockOrchestrator) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "Not Found", http.StatusNotFound)
 			}
 		case http.MethodPost:
-			var result map[string]interface{}
+			var result TaskResult
 			err := json.NewDecoder(r.Body).Decode(&result)
 			if err != nil {
 				http.Error(w, "Bad Request", http.StatusBadRequest)
 				return
 			}
-			m.taskResult <- result
+			m.taskResult <- &result
 			w.WriteHeader(http.StatusOK)
 		default:
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
@@ -92,7 +92,7 @@ func (m *mockOrchestrator) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func TestWorker_SuccessfulTask(t *testing.T) {
 	mock := &mockOrchestrator{
 		taskResponse: &TaskResponse{},
-		taskResult:   make(chan map[string]interface{}, 1),
+		taskResult:   make(chan *TaskResult, 1),
 	}
 	mock.taskResponse.Task.ID = "task1337"
 	mock.taskResponse.Task.Arg1 = 228
@@ -113,18 +113,18 @@ func TestWorker_SuccessfulTask(t *testing.T) {
 		agent.worker(0)
 	}()
 
-	time.Sleep(2500 * time.Millisecond)
+	time.Sleep(2 * time.Duration(mock.taskResponse.Task.OperationTime) * time.Millisecond)
 
 	select {
 	case result := <-mock.taskResult:
-		expectedResult := map[string]interface{}{
-			"id":     "task1337",
-			"result": 230.0,
+		expectedResult := &TaskResult{
+			ID:     "task1337",
+			Result: 230.0,
 		}
 		if !reflect.DeepEqual(result, expectedResult) {
 			t.Errorf("Unexpected result: %+v, expected %+v", result, expectedResult)
 		}
-	case <-time.After(500 * time.Millisecond):
+	case <-time.After(2 * time.Duration(mock.taskResponse.Task.OperationTime) * time.Millisecond):
 		t.Errorf("Timeout waiting for task result")
 	}
 
@@ -133,7 +133,7 @@ func TestWorker_SuccessfulTask(t *testing.T) {
 func TestWorker_Handle404(t *testing.T) {
 	mock := &mockOrchestrator{
 		taskResponse: nil,
-		taskResult:   make(chan map[string]interface{}, 1),
+		taskResult:   make(chan *TaskResult, 1),
 	}
 	server := httptest.NewServer(mock)
 	defer server.Close()
@@ -148,7 +148,7 @@ func TestWorker_Handle404(t *testing.T) {
 		agent.worker(0)
 	}()
 
-	time.Sleep(2500 * time.Millisecond)
+	time.Sleep(5 * time.Second)
 
 	select {
 	case _, ok := <-mock.taskResult:
@@ -162,7 +162,7 @@ func TestWorker_Handle404(t *testing.T) {
 func TestWorker_HandleErrorStatusCode(t *testing.T) {
 	mock := &mockOrchestrator{
 		taskResponse: &TaskResponse{},
-		taskResult:   make(chan map[string]interface{}, 1),
+		taskResult:   make(chan *TaskResult, 1),
 	}
 
 	mock.taskResponse.Task.ID = "task228"
@@ -189,6 +189,6 @@ func TestWorker_HandleErrorStatusCode(t *testing.T) {
 	select {
 	case <-mock.taskResult:
 		t.Errorf("Unexpected result sent after error status code")
-	case <-time.After(2500 * time.Millisecond):
+	case <-time.After(2 * time.Duration(mock.taskResponse.Task.OperationTime) * time.Millisecond):
 	}
 }

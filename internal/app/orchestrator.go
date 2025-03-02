@@ -24,26 +24,6 @@ const (
 	TIME_DIVISIONS_MS       = 300
 )
 
-type Expression struct {
-	ID     string   `json:"id"`
-	Expr   string   `json:"expression"`
-	Status string   `json:"status"`
-	Result *float64 `json:"result,omitempty"`
-	AST    *ASTNode `json:"-"`
-}
-
-// ExpressionRequest swagger model
-// @Description Математическое выражение для расчёта
-type ExpressionRequest struct {
-	Expression string `json:"expression" binding:"required" example:"2+3*4-5/2"`
-}
-
-// ExpressionResponse swagger model
-// @Description Ответ с идентификатором задачи
-type ExpressionResponse struct {
-	ID string `json:"id" example:"1"`
-}
-
 // Error swagger model
 // @Description Описание ошибки
 type Error struct {
@@ -58,6 +38,14 @@ type Task struct {
 	Operation     string   `json:"operation"`
 	OperationTime int      `json:"operation_time"`
 	Node          *ASTNode `json:"-"`
+}
+
+type Expression struct {
+	ID     string   `json:"id"`
+	Expr   string   `json:"expression"`
+	Status string   `json:"status"`
+	Result *float64 `json:"result,omitempty"`
+	AST    *ASTNode `json:"-"`
 }
 
 type OrchestratorConfig struct {
@@ -95,6 +83,12 @@ func NewOrchestrator() *Orchestrator {
 		taskStorage:     make(map[string]*Task),
 		taskQueue:       *queue.New(),
 	}
+}
+
+// ExpressionRequest swagger model
+// @Description Математическое выражение для расчёта
+type ExpressionRequest struct {
+	Expression string `json:"expression" binding:"required" example:"2+3*4-5/2"`
 }
 
 // @Summary Schedule mathematical expression calculation
@@ -137,11 +131,20 @@ func (o *Orchestrator) handleCalculateRequest(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"id": exprID})
 }
 
+// ExpressionsResponse swagger model
+// @Description Ответ с идентификатором задачи
+type ExpressionsResponse struct {
+	ID         string   `json:"id" example:"1"`
+	Expression string   `json:"expression" example:"2+3*4-5/2"`
+	Status     string   `json:"status" example:"completed"`
+	Result     *float64 `json:"result,omitempty" example:"11.5"`
+}
+
 // @Summary Get all calculated expressions
 // @Description Retrieve list of all expressions with their current status
 // @Tags calculations
 // @Produce json
-// @Success 200 {array} ExpressionResponse
+// @Success 200 {array} ExpressionsResponse
 // @Router /expressions [get]
 func (o *Orchestrator) handleExpressionsRequest(c *gin.Context) {
 	if c.Request.Method != http.MethodGet {
@@ -159,6 +162,12 @@ func (o *Orchestrator) handleExpressionsRequest(c *gin.Context) {
 		exprs = append(exprs, expr)
 	}
 	c.JSON(http.StatusOK, gin.H{"expressions": exprs})
+}
+
+// ExpressionResponse swagger model
+// @Description Ответ с идентификатором задачи
+type ExpressionResponse struct {
+	ID string `json:"id" example:"1"`
 }
 
 // @Summary Get expression by ID
@@ -221,6 +230,12 @@ func (o *Orchestrator) handleGetTaskRequest(c *gin.Context) {
 		expr.Status = "in_progress"
 	}
 	c.JSON(http.StatusOK, gin.H{"task": task})
+}
+
+// SuccessResponse swagger model
+// @Description Успешный ответ
+type SuccessResponse struct {
+	Status string `json:"status" example:"result accepted"`
 }
 
 // @Summary Submit task result

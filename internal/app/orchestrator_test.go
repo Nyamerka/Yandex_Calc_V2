@@ -178,6 +178,7 @@ func TestHandleGetTaskRequest(t *testing.T) {
 		Operation:     "+",
 		OperationTime: 100,
 	}
+
 	orchestrator.taskStorage[taskID] = task
 	orchestrator.taskQueue.PushBack(task)
 	orchestrator.mutex.Unlock()

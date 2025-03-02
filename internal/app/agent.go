@@ -36,12 +36,6 @@ type TaskResult struct {
 	Result float64 `json:"result" example:"5.0"`
 }
 
-// SuccessResponse swagger model
-// @Description Успешный ответ
-type SuccessResponse struct {
-	Status string `json:"status" example:"result accepted"`
-}
-
 type Agent struct {
 	ComputingPower  int
 	OrchestratorURL string
