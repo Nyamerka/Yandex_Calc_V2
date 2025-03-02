@@ -21,25 +21,25 @@ const (
 // @Description Информация о задаче
 type TaskResponse struct {
 	Task struct {
-		ID            string  `json:"id"`
-		Arg1          float64 `json:"arg1"`
-		Arg2          float64 `json:"arg2"`
-		Operation     string  `json:"operation"`
-		OperationTime int     `json:"operation_time"`
+		ID            string  `json:"id" example:"1"`
+		Arg1          float64 `json:"arg1" example:"2.0"`
+		Arg2          float64 `json:"arg2" example:"3.0"`
+		Operation     string  `json:"operation" example:"+"`
+		OperationTime int     `json:"operation_time" example:"200"`
 	} `json:"task"`
 }
 
 // TaskResult swagger model
 // @Description Результат задачи
 type TaskResult struct {
-	ID     string  `json:"id"`
-	Result float64 `json:"result"`
+	ID     string  `json:"id" example:"1"`
+	Result float64 `json:"result" example:"5.0"`
 }
 
 // SuccessResponse swagger model
 // @Description Успешный ответ
 type SuccessResponse struct {
-	Status string `json:"status"`
+	Status string `json:"status" example:"result accepted"`
 }
 
 type Agent struct {

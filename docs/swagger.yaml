@@ -4,12 +4,14 @@ definitions:
     description: Описание ошибки
     properties:
       error:
+        example: Invalid expression
         type: string
     type: object
   app.ExpressionRequest:
     description: Математическое выражение для расчёта
     properties:
       expression:
+        example: 2+3*4-5/2
         type: string
     required:
     - expression
@@ -18,49 +20,58 @@ definitions:
     description: Ответ с идентификатором задачи
     properties:
       id:
+        example: "123"
         type: string
     type: object
   app.SuccessResponse:
     description: Успешный ответ
     properties:
       status:
+        example: result accepted
         type: string
     type: object
-  app.TaskResult:
-    description: Результат задачи
-    properties:
-      id:
-        type: string
-      result:
-        type: number
-    type: object
-  app.taskResponse:
+  app.TaskResponse:
     description: Информация о задаче
     properties:
       task:
         properties:
           arg1:
+            example: 2
             type: number
           arg2:
+            example: 3
             type: number
           id:
+            example: "1"
             type: string
           operation:
+            example: +
             type: string
           operation_time:
+            example: 200
             type: integer
         type: object
+    type: object
+  app.TaskResult:
+    description: Результат задачи
+    properties:
+      id:
+        example: "1"
+        type: string
+      result:
+        example: 5
+        type: number
     type: object
 host: localhost:8080
 info:
   contact:
-    name: '@Nyamerka'
+    name: Nyamerka
   description: Calculator service with distributed computation
   termsOfService: http://swagger.io/terms/
   title: Yandex Calculator API
   version: "1.0"
 paths:
-  /api/v1/calculate:
+  /calculate:
     post:
       consumes:
       - application/json
@@ -90,7 +101,7 @@ paths:
       summary: Schedule mathematical expression calculation
       tags:
       - calculations
-  /api/v1/expressions:
+  /expressions:
     get:
       description: Retrieve list of all expressions with their current status
       produces:
@@ -105,7 +116,7 @@ paths:
       summary: Get all calculated expressions
       tags:
       - calculations
-  /api/v1/expressions/{id}:
+  /expressions/{id}:
     get:
       description: Retrieve specific expression details by unique identifier
       parameters:
@@ -137,7 +148,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.taskResponse'
+            $ref: '#/definitions/app.TaskResponse'
         "404":
           description: No tasks available
           schema:

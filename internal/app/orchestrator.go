@@ -35,19 +35,19 @@ type Expression struct {
 // ExpressionRequest swagger model
 // @Description Математическое выражение для расчёта
 type ExpressionRequest struct {
-	Expression string `json:"expression" binding:"required"`
+	Expression string `json:"expression" binding:"required" example:"2+3*4-5/2"`
 }
 
 // ExpressionResponse swagger model
 // @Description Ответ с идентификатором задачи
 type ExpressionResponse struct {
-	ID string `json:"id"`
+	ID string `json:"id" example:"1"`
 }
 
 // Error swagger model
 // @Description Описание ошибки
 type Error struct {
-	Error string `json:"error"`
+	Error string `json:"error" example:"Invalid expression"`
 }
 
 type Task struct {
@@ -102,11 +102,11 @@ func NewOrchestrator() *Orchestrator {
 // @Tags calculations
 // @Accept json
 // @Produce json
-// @Param expression body ExpressionRequest true "Mathematical expression to calculate"// @Success 201 {object} {id string} "Calculation ID"
+// @Param expression body ExpressionRequest true "Mathematical expression to calculate"
 // @Success 201 {object} ExpressionResponse "Calculation ID"
 // @Failure 400 {object} Error "Invalid request body"
 // @Failure 500 {object} Error "Internal server error"
-// @Router /api/v1/calculate [post]
+// @Router /calculate [post]
 func (o *Orchestrator) handleCalculateRequest(c *gin.Context) {
 	if c.Request.Method != http.MethodPost {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Wrong Method"})
@@ -142,7 +142,7 @@ func (o *Orchestrator) handleCalculateRequest(c *gin.Context) {
 // @Tags calculations
 // @Produce json
 // @Success 200 {array} ExpressionResponse
-// @Router /api/v1/expressions [get]
+// @Router /expressions [get]
 func (o *Orchestrator) handleExpressionsRequest(c *gin.Context) {
 	if c.Request.Method != http.MethodGet {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Wrong Method"})
@@ -168,7 +168,7 @@ func (o *Orchestrator) handleExpressionsRequest(c *gin.Context) {
 // @Param id path string true "Expression ID"
 // @Success 200 {object} ExpressionResponse
 // @Failure 404 {object} Error "Expression not found"
-// @Router /api/v1/expressions/{id} [get]
+// @Router /expressions/{id} [get]
 func (o *Orchestrator) handleExpressionByIdRequest(c *gin.Context) {
 	if c.Request.Method != http.MethodGet {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Wrong Method"})

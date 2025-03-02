@@ -11,14 +11,14 @@ const docTemplate = `{
         "title": "{{.Title}}",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
-            "name": "@Nyamerka"
+            "name": "Nyamerka"
         },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/calculate": {
+        "/calculate": {
             "post": {
                 "description": "Parse expression and create a new calculation task",
                 "consumes": [
@@ -64,7 +64,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/expressions": {
+        "/expressions": {
             "get": {
                 "description": "Retrieve list of all expressions with their current status",
                 "produces": [
@@ -87,7 +87,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/expressions/{id}": {
+        "/expressions/{id}": {
             "get": {
                 "description": "Retrieve specific expression details by unique identifier",
                 "produces": [
@@ -136,7 +136,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.taskResponse"
+                            "$ref": "#/definitions/app.TaskResponse"
                         }
                     },
                     "404": {
@@ -199,7 +199,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "error": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Invalid expression"
                 }
             }
         },
@@ -211,7 +212,8 @@ const docTemplate = `{
             ],
             "properties": {
                 "expression": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2+3*4-5/2"
                 }
             }
         },
@@ -220,7 +222,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "123"
                 }
             }
         },
@@ -229,7 +232,39 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "status": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "result accepted"
+                }
+            }
+        },
+        "app.TaskResponse": {
+            "description": "Информация о задаче",
+            "type": "object",
+            "properties": {
+                "task": {
+                    "type": "object",
+                    "properties": {
+                        "arg1": {
+                            "type": "number",
+                            "example": 2
+                        },
+                        "arg2": {
+                            "type": "number",
+                            "example": 3
+                        },
+                        "id": {
+                            "type": "string",
+                            "example": "1"
+                        },
+                        "operation": {
+                            "type": "string",
+                            "example": "+"
+                        },
+                        "operation_time": {
+                            "type": "integer",
+                            "example": 200
+                        }
+                    }
                 }
             }
         },
@@ -238,36 +273,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "1"
                 },
                 "result": {
-                    "type": "number"
-                }
-            }
-        },
-        "app.taskResponse": {
-            "description": "Информация о задаче",
-            "type": "object",
-            "properties": {
-                "task": {
-                    "type": "object",
-                    "properties": {
-                        "arg1": {
-                            "type": "number"
-                        },
-                        "arg2": {
-                            "type": "number"
-                        },
-                        "id": {
-                            "type": "string"
-                        },
-                        "operation": {
-                            "type": "string"
-                        },
-                        "operation_time": {
-                            "type": "integer"
-                        }
-                    }
+                    "type": "number",
+                    "example": 5
                 }
             }
         }
