@@ -13,7 +13,7 @@ import (
 )
 
 type mockOrchestrator struct {
-	taskResponse *taskResponse
+	taskResponse *TaskResponse
 	taskResult   chan map[string]interface{}
 }
 
@@ -91,7 +91,7 @@ func (m *mockOrchestrator) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func TestWorker_SuccessfulTask(t *testing.T) {
 	mock := &mockOrchestrator{
-		taskResponse: &taskResponse{},
+		taskResponse: &TaskResponse{},
 		taskResult:   make(chan map[string]interface{}, 1),
 	}
 	mock.taskResponse.Task.ID = "task1337"
@@ -161,7 +161,7 @@ func TestWorker_Handle404(t *testing.T) {
 
 func TestWorker_HandleErrorStatusCode(t *testing.T) {
 	mock := &mockOrchestrator{
-		taskResponse: &taskResponse{},
+		taskResponse: &TaskResponse{},
 		taskResult:   make(chan map[string]interface{}, 1),
 	}
 

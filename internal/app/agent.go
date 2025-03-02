@@ -17,9 +17,9 @@ const (
 	ORCHESTRATOR_URL = "http://localhost:8080"
 )
 
-// taskResponse swagger model
+// TaskResponse swagger model
 // @Description Информация о задаче
-type taskResponse struct {
+type TaskResponse struct {
 	Task struct {
 		ID            string  `json:"id"`
 		Arg1          float64 `json:"arg1"`
@@ -114,7 +114,7 @@ func (a *Agent) worker(id int) {
 			time.Sleep(2 * time.Second)
 			continue
 		}
-		var taskResp taskResponse
+		var taskResp TaskResponse
 		err = json.NewDecoder(resp.Body).Decode(&taskResp)
 		if err != nil {
 			log.Printf("Worker %d: error decoding task: %v", id, err)
@@ -133,9 +133,9 @@ func (a *Agent) worker(id int) {
 			log.Printf("Worker %d: error computing task %s: %v", id, task.ID, err)
 			continue
 		}
-		resultPayload := map[string]interface{}{
-			"id":     task.ID,
-			"result": result,
+		resultPayload := &TaskResult{
+			ID:     task.ID,
+			Result: result,
 		}
 		payloadBytes, err := json.Marshal(resultPayload)
 		if err != nil {

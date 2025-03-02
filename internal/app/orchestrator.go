@@ -112,9 +112,7 @@ func (o *Orchestrator) handleCalculateRequest(c *gin.Context) {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Wrong Method"})
 		return
 	}
-	var req struct {
-		Expression string `json:"expression"`
-	}
+	var req ExpressionRequest
 	if err := c.ShouldBindJSON(&req); err != nil || req.Expression == "" {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "Invalid Body"})
 		return
@@ -195,7 +193,7 @@ func (o *Orchestrator) handleExpressionByIdRequest(c *gin.Context) {
 // @Description Get the next task from the calculation queue (internal use)
 // @Tags internal
 // @Produce json
-// @Success 200 {object} taskResponse
+// @Success 200 {object} TaskResponse
 // @Failure 404 {object} Error "No tasks available"
 // @Router /internal/task [get]
 func (o *Orchestrator) handleGetTaskRequest(c *gin.Context) {
@@ -240,10 +238,7 @@ func (o *Orchestrator) handlePostTaskRequest(c *gin.Context) {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Wrong Method"})
 		return
 	}
-	var req struct {
-		ID     string  `json:"id"`
-		Result float64 `json:"result"`
-	}
+	var req TaskResult
 	if err := c.ShouldBindJSON(&req); err != nil || req.ID == "" {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "Invalid Body"})
 		return
