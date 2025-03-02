@@ -5,7 +5,14 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 
+RUN go mod tidy
+
 COPY . .
+
+RUN go install github.com/swaggo/swag/cmd/swag@latest && \
+    export PATH=$PATH:$(go env GOPATH)/bin
+
+RUN swag init -d cmd,internal/app -o docs
 
 RUN go test -v ./internal/...
 

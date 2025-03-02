@@ -17,6 +17,8 @@ const (
 	ORCHESTRATOR_URL = "http://localhost:8080"
 )
 
+// taskResponse swagger model
+// @Description Информация о задаче
 type taskResponse struct {
 	Task struct {
 		ID            string  `json:"id"`
@@ -25,6 +27,19 @@ type taskResponse struct {
 		Operation     string  `json:"operation"`
 		OperationTime int     `json:"operation_time"`
 	} `json:"task"`
+}
+
+// TaskResult swagger model
+// @Description Результат задачи
+type TaskResult struct {
+	ID     string  `json:"id"`
+	Result float64 `json:"result"`
+}
+
+// SuccessResponse swagger model
+// @Description Успешный ответ
+type SuccessResponse struct {
+	Status string `json:"status"`
 }
 
 type Agent struct {
@@ -82,7 +97,7 @@ func (a *Agent) worker(id int) {
 			if err != nil {
 				log.Printf("Worker %d: error closing task body: %v", id, err)
 			}
-			time.Sleep(1 * time.Second)
+			time.Sleep(2 * time.Second)
 			continue
 		}
 		if resp.StatusCode != http.StatusOK {
@@ -96,14 +111,14 @@ func (a *Agent) worker(id int) {
 			if err != nil {
 				log.Printf("Worker %d: error closing task body: %v", id, err)
 			}
-			time.Sleep(1 * time.Second)
+			time.Sleep(2 * time.Second)
 			continue
 		}
 		var taskResp taskResponse
 		err = json.NewDecoder(resp.Body).Decode(&taskResp)
 		if err != nil {
 			log.Printf("Worker %d: error decoding task: %v", id, err)
-			time.Sleep(1 * time.Second)
+			time.Sleep(2 * time.Second)
 			continue
 		}
 		err = resp.Body.Close()

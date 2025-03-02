@@ -1,0 +1,269 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Calculator service with distributed computation",
+        "title": "Yandex Calculator API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "@Nyamerka"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/api/v1/calculate": {
+            "post": {
+                "description": "Parse expression and create a new calculation task",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "calculations"
+                ],
+                "summary": "Schedule mathematical expression calculation",
+                "parameters": [
+                    {
+                        "description": "Mathematical expression to calculate",
+                        "name": "expression",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.ExpressionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Calculation ID",
+                        "schema": {
+                            "$ref": "#/definitions/app.ExpressionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/app.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/expressions": {
+            "get": {
+                "description": "Retrieve list of all expressions with their current status",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "calculations"
+                ],
+                "summary": "Get all calculated expressions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/app.ExpressionResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/expressions/{id}": {
+            "get": {
+                "description": "Retrieve specific expression details by unique identifier",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "calculations"
+                ],
+                "summary": "Get expression by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Expression ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.ExpressionResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Expression not found",
+                        "schema": {
+                            "$ref": "#/definitions/app.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/internal/task": {
+            "get": {
+                "description": "Get the next task from the calculation queue (internal use)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "internal"
+                ],
+                "summary": "Fetch next available task",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.taskResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "No tasks available",
+                        "schema": {
+                            "$ref": "#/definitions/app.Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Report calculation result for a specific task (internal use)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "internal"
+                ],
+                "summary": "Submit task result",
+                "parameters": [
+                    {
+                        "description": "Task result data",
+                        "name": "taskResult",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.TaskResult"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Result accepted",
+                        "schema": {
+                            "$ref": "#/definitions/app.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/app.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Task not found",
+                        "schema": {
+                            "$ref": "#/definitions/app.Error"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "app.Error": {
+            "description": "Описание ошибки",
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.ExpressionRequest": {
+            "description": "Математическое выражение для расчёта",
+            "type": "object",
+            "required": [
+                "expression"
+            ],
+            "properties": {
+                "expression": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.ExpressionResponse": {
+            "description": "Ответ с идентификатором задачи",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.SuccessResponse": {
+            "description": "Успешный ответ",
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.TaskResult": {
+            "description": "Результат задачи",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "result": {
+                    "type": "number"
+                }
+            }
+        },
+        "app.taskResponse": {
+            "description": "Информация о задаче",
+            "type": "object",
+            "properties": {
+                "task": {
+                    "type": "object",
+                    "properties": {
+                        "arg1": {
+                            "type": "number"
+                        },
+                        "arg2": {
+                            "type": "number"
+                        },
+                        "id": {
+                            "type": "string"
+                        },
+                        "operation": {
+                            "type": "string"
+                        },
+                        "operation_time": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,177 @@
+basePath: /api/v1
+definitions:
+  app.Error:
+    description: Описание ошибки
+    properties:
+      error:
+        type: string
+    type: object
+  app.ExpressionRequest:
+    description: Математическое выражение для расчёта
+    properties:
+      expression:
+        type: string
+    required:
+    - expression
+    type: object
+  app.ExpressionResponse:
+    description: Ответ с идентификатором задачи
+    properties:
+      id:
+        type: string
+    type: object
+  app.SuccessResponse:
+    description: Успешный ответ
+    properties:
+      status:
+        type: string
+    type: object
+  app.TaskResult:
+    description: Результат задачи
+    properties:
+      id:
+        type: string
+      result:
+        type: number
+    type: object
+  app.taskResponse:
+    description: Информация о задаче
+    properties:
+      task:
+        properties:
+          arg1:
+            type: number
+          arg2:
+            type: number
+          id:
+            type: string
+          operation:
+            type: string
+          operation_time:
+            type: integer
+        type: object
+    type: object
+host: localhost:8080
+info:
+  contact:
+    name: '@Nyamerka'
+  description: Calculator service with distributed computation
+  termsOfService: http://swagger.io/terms/
+  title: Yandex Calculator API
+  version: "1.0"
+paths:
+  /api/v1/calculate:
+    post:
+      consumes:
+      - application/json
+      description: Parse expression and create a new calculation task
+      parameters:
+      - description: Mathematical expression to calculate
+        in: body
+        name: expression
+        required: true
+        schema:
+          $ref: '#/definitions/app.ExpressionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Calculation ID
+          schema:
+            $ref: '#/definitions/app.ExpressionResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/app.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/app.Error'
+      summary: Schedule mathematical expression calculation
+      tags:
+      - calculations
+  /api/v1/expressions:
+    get:
+      description: Retrieve list of all expressions with their current status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/app.ExpressionResponse'
+            type: array
+      summary: Get all calculated expressions
+      tags:
+      - calculations
+  /api/v1/expressions/{id}:
+    get:
+      description: Retrieve specific expression details by unique identifier
+      parameters:
+      - description: Expression ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.ExpressionResponse'
+        "404":
+          description: Expression not found
+          schema:
+            $ref: '#/definitions/app.Error'
+      summary: Get expression by ID
+      tags:
+      - calculations
+  /internal/task:
+    get:
+      description: Get the next task from the calculation queue (internal use)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.taskResponse'
+        "404":
+          description: No tasks available
+          schema:
+            $ref: '#/definitions/app.Error'
+      summary: Fetch next available task
+      tags:
+      - internal
+    post:
+      consumes:
+      - application/json
+      description: Report calculation result for a specific task (internal use)
+      parameters:
+      - description: Task result data
+        in: body
+        name: taskResult
+        required: true
+        schema:
+          $ref: '#/definitions/app.TaskResult'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Result accepted
+          schema:
+            $ref: '#/definitions/app.SuccessResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/app.Error'
+        "404":
+          description: Task not found
+          schema:
+            $ref: '#/definitions/app.Error'
+      summary: Submit task result
+      tags:
+      - internal
+swagger: "2.0"

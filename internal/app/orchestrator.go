@@ -3,11 +3,14 @@ package app
 import (
 	"Yandex_Calc_V2.0/internal/eval"
 	"Yandex_Calc_V2.0/internal/queue"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"log"
 	"net/http"
 	"strconv"
 	"sync"
 	"time"
+
+	swaggerfiles "github.com/swaggo/files"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,6 +30,24 @@ type Expression struct {
 	Status string   `json:"status"`
 	Result *float64 `json:"result,omitempty"`
 	AST    *ASTNode `json:"-"`
+}
+
+// ExpressionRequest swagger model
+// @Description Математическое выражение для расчёта
+type ExpressionRequest struct {
+	Expression string `json:"expression" binding:"required"`
+}
+
+// ExpressionResponse swagger model
+// @Description Ответ с идентификатором задачи
+type ExpressionResponse struct {
+	ID string `json:"id"`
+}
+
+// Error swagger model
+// @Description Описание ошибки
+type Error struct {
+	Error string `json:"error"`
 }
 
 type Task struct {
@@ -76,6 +97,16 @@ func NewOrchestrator() *Orchestrator {
 	}
 }
 
+// @Summary Schedule mathematical expression calculation
+// @Description Parse expression and create a new calculation task
+// @Tags calculations
+// @Accept json
+// @Produce json
+// @Param expression body ExpressionRequest true "Mathematical expression to calculate"// @Success 201 {object} {id string} "Calculation ID"
+// @Success 201 {object} ExpressionResponse "Calculation ID"
+// @Failure 400 {object} Error "Invalid request body"
+// @Failure 500 {object} Error "Internal server error"
+// @Router /api/v1/calculate [post]
 func (o *Orchestrator) handleCalculateRequest(c *gin.Context) {
 	if c.Request.Method != http.MethodPost {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Wrong Method"})
@@ -108,6 +139,12 @@ func (o *Orchestrator) handleCalculateRequest(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"id": exprID})
 }
 
+// @Summary Get all calculated expressions
+// @Description Retrieve list of all expressions with their current status
+// @Tags calculations
+// @Produce json
+// @Success 200 {array} ExpressionResponse
+// @Router /api/v1/expressions [get]
 func (o *Orchestrator) handleExpressionsRequest(c *gin.Context) {
 	if c.Request.Method != http.MethodGet {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Wrong Method"})
@@ -126,6 +163,14 @@ func (o *Orchestrator) handleExpressionsRequest(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"expressions": exprs})
 }
 
+// @Summary Get expression by ID
+// @Description Retrieve specific expression details by unique identifier
+// @Tags calculations
+// @Produce json
+// @Param id path string true "Expression ID"
+// @Success 200 {object} ExpressionResponse
+// @Failure 404 {object} Error "Expression not found"
+// @Router /api/v1/expressions/{id} [get]
 func (o *Orchestrator) handleExpressionByIdRequest(c *gin.Context) {
 	if c.Request.Method != http.MethodGet {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Wrong Method"})
@@ -146,6 +191,13 @@ func (o *Orchestrator) handleExpressionByIdRequest(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"expression": expr})
 }
 
+// @Summary Fetch next available task
+// @Description Get the next task from the calculation queue (internal use)
+// @Tags internal
+// @Produce json
+// @Success 200 {object} taskResponse
+// @Failure 404 {object} Error "No tasks available"
+// @Router /internal/task [get]
 func (o *Orchestrator) handleGetTaskRequest(c *gin.Context) {
 	if c.Request.Method != http.MethodGet {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Wrong Method"})
@@ -173,6 +225,16 @@ func (o *Orchestrator) handleGetTaskRequest(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"task": task})
 }
 
+// @Summary Submit task result
+// @Description Report calculation result for a specific task (internal use)
+// @Tags internal
+// @Accept json
+// @Produce json
+// @Param taskResult body TaskResult true "Task result data"
+// @Success 200 {object} SuccessResponse "Result accepted"
+// @Failure 400 {object} Error "Invalid request body"
+// @Failure 404 {object} Error "Task not found"
+// @Router /internal/task [post]
 func (o *Orchestrator) handlePostTaskRequest(c *gin.Context) {
 	if c.Request.Method != http.MethodPost {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Wrong Method"})
@@ -261,6 +323,8 @@ func (o *Orchestrator) scheduleTasksForExpression(expr *Expression) {
 
 func (o *Orchestrator) StartServer() error {
 	r := gin.Default()
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	r.POST("/api/v1/calculate", o.handleCalculateRequest)
 	r.GET("/api/v1/expressions", o.handleExpressionsRequest)
